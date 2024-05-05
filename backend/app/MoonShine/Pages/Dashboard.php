@@ -4,11 +4,26 @@ declare(strict_types=1);
 
 namespace App\MoonShine\Pages;
 
+use App\Service\UserKeyService;
+use MoonShine\Decorations\Block;
+use MoonShine\Decorations\Column;
+use MoonShine\Decorations\Grid;
+use MoonShine\Decorations\TextBlock;
 use MoonShine\Pages\Page;
 use MoonShine\Components\MoonShineComponent;
 
 class Dashboard extends Page
 {
+    private string $countUsers;
+
+    public function beforeRender(): void
+    {
+        $userKeyService = app(UserKeyService::class);
+        $this->countUsers = (string) $userKeyService->getUsersCount();
+    }
+
+    protected string $title = 'Settings';
+
     /**
      * @return array<string, string>
      */
@@ -24,11 +39,21 @@ class Dashboard extends Page
         return $this->title ?: 'Dashboard';
     }
 
-    /**
-     * @return list<MoonShineComponent>
-     */
     public function components(): array
-	{
-		return [];
-	}
+    {
+        return [
+            Grid::make([
+                Column::make([
+                    Block::make([
+                        TextBlock::make('Number of users', $this->countUsers)
+                    ])
+                ])->columnSpan(6),
+                Column::make([
+                    Block::make([
+                        TextBlock::make('Title 2', 'Text 2')
+                    ])
+                ])->columnSpan(6),
+            ])
+        ];
+    }
 }
